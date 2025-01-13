@@ -1,0 +1,258 @@
+<div class="wrapper">
+  <app-menu></app-menu>
+  <div class="main">
+    <app-header></app-header>
+    <main class="content">
+      <div class="container-fluid p-0">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a routerLink="/home">Home</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Usuarios</li>
+          </ol>
+        </nav>
+
+        <!-- Title -->
+        <h1 class="h3 mb-3">
+          <i class="fas fa-users"></i> Usuarios
+        </h1>
+
+        <!-- Table of Users -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card flex-fill">
+              <div class="card-header">
+                <button type="button" title="Crear" (click)="crear()" class="btn btn-outline-success float-end">
+                  <i class="fas fa-check"></i> Crear
+                </button>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">Id</th>
+                        <th scope="col">Usuario</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Estado</th>
+                        <th scope="col">Rol</th>
+                        <th scope="col">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let dato of datos; trackBy: trackById">
+                        <td>{{ dato.id }}</td>
+                        <td>{{ dato.username }}</td>
+                        <td>{{ dato.email }}</td>
+                        <td>
+                          <span *ngIf="dato.isEnabled" class="text-success">Activo</span>
+                          <span *ngIf="!dato.isEnabled" class="text-danger">Inactivo</span>
+                        </td>
+                        <td>{{dato.roles?.join(',')}}</td>
+                        <td class="text-center">
+                          <div class="d-flex justify-content-center align-items-center">
+                            <a (click)="viewDetails(dato)" class="text-info me-3" title="Ver Detalles">
+                              <i class="fas fa-eye"></i>
+                            </a>
+                            <a (click)="editUser(dato)" class="text-primary me-3" title="Editar">
+                              <i class="fas fa-edit"></i>
+                            </a>
+                            <a (click)="deleteUser(dato.id)" class="text-danger" title="Eliminar">
+                              <i class="fas fa-trash"></i>
+                            </a>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr *ngIf="datos.length === 0">
+                        <td colspan="6" class="text-center">No hay usuarios</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Modal -->
+<ng-template #myModalConfig let-modal>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+     <!-- Modal Header -->
+    <div class="modal-header" [ngClass]="{
+      'bg-info': modalTitle === 'Detalles',
+      'bg-warning': modalTitle === 'Editar',
+      'bg-primary': modalTitle === 'Crear',
+      'bg-secondary': !['Detalles', 'Editar', 'Crear'].includes(modalTitle),
+      'text-white': true
+    }">
+
+      <!-- Header Title and Username in a single line -->
+      <div class="d-flex justify-content-between w-100">
+        <h4 class="modal-title">{{ modalTitle || 'Crear' }}</h4>
+        <div *ngIf="modalTitle !== 'Crear'" class="col-md-6 mb-3 text-end">
+          <span>{{ userForm.get('username')?.value }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="btn-close btn-close-white" (click)="cerrar()"></button>
+    </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" autocomplete="on">
+          <div class="row">
+
+            <!-- ID (Solo para Editar) -->
+            <div *ngIf="modalTitle !== 'Crear'" class="col-md-6 mb-3">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-id-badge me-2"></i>
+                <span class="form-control-plaintext">{{ userForm.get('id')?.value }}</span>
+              </div>
+            </div>
+
+            <!-- Username -->
+            <div class="col-md-6 mb-3">
+              <label for="username" class="form-label">Nombre de Usuario</label>
+              <input [readonly]="modalTitle === 'Detalles'" type="text" class="form-control" id="username" formControlName="username" autocomplete="username" />
+              <div *ngIf="userForm.get('username')?.invalid && userForm.get('username')?.touched" class="text-danger">
+                El nombre de usuario no puede estar vacío.
+              </div>
+            </div>
+
+            <!-- Password (solo para Crear o Editar) -->
+            <div *ngIf="modalTitle === 'Crear' " class="col-md-6 mb-3">
+              <label for="password" class="form-label">Contraseña</label>
+              <input type="password" class="form-control" id="password" formControlName="password" placeholder="Ingrese la contraseña" autocomplete="current-password" />
+              <div *ngIf="userForm.get('password')?.invalid && userForm.get('password')?.touched" class="text-danger">
+                La contraseña no puede estar vacía.
+              </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="col-md-6 mb-3">
+              <label for="isEnabled" class="form-label">Estado</label>
+              <div class="form-check form-switch" *ngIf="modalTitle !== 'Detalles'">
+                <input class="form-check-input" type="checkbox" id="isEnabled" formControlName="isEnabled" />
+                <label class="form-check-label" for="isEnabled">Activo</label>
+              </div>
+
+              <div *ngIf="modalTitle === 'Detalles'">
+                <span class="badge" [ngClass]="{
+                    'bg-success': userForm.get('isEnabled')?.value,
+                    'bg-danger': !userForm.get('isEnabled')?.value
+                  }">
+                  {{ userForm.get('isEnabled')?.value ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Correo</label>
+              <input [readonly]="modalTitle === 'Detalles'" type="email" class="form-control" id="email" formControlName="email" placeholder="Ingrese correo" autocomplete="email" />
+              <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="text-danger">
+                El correo no puede estar vacío.
+              </div>
+            </div>
+
+            <!-- Full Name -->
+            <div class="col-md-6 mb-3">
+              <label for="fullName" class="form-label">Nombre completo</label>
+              <input [readonly]="modalTitle === 'Detalles'" type="text" class="form-control" id="fullName" formControlName="fullName" placeholder="Ingrese nombre completo" autocomplete="name" />
+              <div *ngIf="userForm.get('fullName')?.invalid && userForm.get('fullName')?.touched" class="text-danger">
+                El nombre completo no puede estar vacío.
+              </div>
+            </div>
+
+            <!-- Roles (solo para Crear o Editar) -->
+            <div *ngIf="modalTitle === 'Crear' || modalTitle === 'Editar'" class="col-md-6 mb-3">
+              <label for="roleRequest" class="form-label">{{ modalTitle === 'Crear' ? 'Selecciona Roles' : 'Roles' }}</label>
+              <select class="form-control" id="roleRequest" formControlName="roleRequest" multiple autocomplete="off">
+                <option *ngFor="let rol of roles" [value]="rol.roleName" [ngClass]="{ 'bg-warning': userForm.value.roleRequest.includes(rol.roleName) }">
+                  {{ rol.roleName }}
+                </option>
+              </select>
+              <div *ngIf="userForm.get('roleRequest')?.invalid && userForm.get('roleRequest')?.touched" class="text-danger">
+                El rol no puede estar vacío.
+              </div>
+            </div>
+
+            <!-- Mostrar los roles actuales como badges (solo para Editar o Detalles) -->
+            <div class="col-md-6 mb-3" *ngIf="modalTitle === 'Editar' || modalTitle === 'Detalles'">
+              <label for="roleRequest" class="form-label">Roles Actual definido</label>
+              <div class="d-flex flex-wrap gap-2">
+                <span *ngFor="let rol of rolesAsignados" class="badge bg-warning text-dark">{{ rol }}</span>
+              </div>
+            </div>
+
+            <!-- Date of Birth -->
+            <div class="col-md-6 mb-3">
+              <label for="dateOfBirth" class="form-label">Fecha de Nacimiento</label>
+              <input type="date" class="form-control" id="dateOfBirth" formControlName="dateOfBirth" autocomplete="bday" [readonly]="modalTitle === 'Detalles'" />
+            </div>
+
+            <!-- Phone -->
+            <div class="col-md-6 mb-3">
+              <label for="phone" class="form-label">Teléfono</label>
+              <input type="tel" class="form-control" id="phone" formControlName="phone" autocomplete="tel" [readonly]="modalTitle === 'Detalles'" />
+            </div>
+
+            <!-- Account Expired -->
+            <div *ngIf="modalTitle === 'Crear' || modalTitle === 'Editar'" class="col-md-6 mb-3">
+              <label for="accountNoExpired" class="form-label">Cuenta Expirada</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="accountNoExpired" formControlName="accountNoExpired" />
+                <label class="form-check-label" for="accountNoExpired">Expirada</label>
+              </div>
+            </div>
+
+            <div *ngIf="modalTitle === 'Detalles'">
+              <label for="accountNoExpired" class="form-label"><h6>¿Estado Cuenta Expirada?</h6></label>
+              <span class="badge" [ngClass]="{
+                'bg-success': !userForm.get('accountNoExpired')?.value,
+                'bg-danger': userForm.get('accountNoExpired')?.value
+              }">
+                {{ userForm.get('accountNoExpired')?.value ? 'Cuenta expirada' : 'No' }}
+              </span>
+            </div>
+
+            <!-- Account Locked -->
+            <div *ngIf="modalTitle === 'Crear' || modalTitle === 'Editar'" class="col-md-6 mb-3">
+              <label for="accountNoLocked" class="form-label">Cuenta Bloqueada</label>
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="accountNoLocked" formControlName="accountNoLocked" />
+                <label class="form-check-label" for="accountNoLocked">Bloqueada</label>
+              </div>
+            </div>
+
+            <div *ngIf="modalTitle === 'Detalles'">
+              <label for="accountNoLocked" class="form-label"><h6>¿Estado Cuenta Bloqueada?</h6></label>
+              <span class="badge" [ngClass]="{
+                'bg-success': !userForm.get('accountNoLocked')?.value,
+                'bg-danger': userForm.get('accountNoLocked')?.value
+              }">
+                {{ userForm.get('accountNoLocked')?.value ? 'Bloqueada' : 'No' }}
+              </span>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrar()">Cancelar</button>
+        <button type="button" *ngIf="modalTitle === 'Crear'" class="btn btn-outline-success" [disabled]="userForm.invalid" (click)="enviar()">Guardar</button>
+        <button type="button" *ngIf="modalTitle === 'Editar'" class="btn btn-warning" (click)="editSendUser(userForm.value)">Editar</button>
+      </div>
+    </div>
+  </div>
+</ng-template>

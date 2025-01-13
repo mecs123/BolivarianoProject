@@ -1,0 +1,24 @@
+.permissions-container {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+.permissions-container ul {
+  list-style-type: none;
+}
+
+.permissions-container li {
+  padding: 5px 0;
+}
+
+button {
+  margin-top: 10px;
+}
+
+.warning {
+  background-color: #ffc107; /* Color de advertencia en amarillo */
+  color: #000; /* Color de texto negro para contraste */
+}

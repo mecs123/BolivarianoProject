@@ -1,0 +1,48 @@
+<!-- Spinner mientras se carga la autenticación -->
+<ngx-spinner bdColor="rgba(0, 0, 0, 0.8)" size="small" color="#fff" type="ball-scale-ripple" [fullScreen]="true">
+  <p style="color: rgb(152, 205, 170)">Ingresando...</p>
+</ngx-spinner>
+
+<main class="d-flex w-100">
+  <div class="container d-flex flex-column">
+    <div class="row vh-100">
+      <div class="col-sm-10 col-md-8 col-lg-6 mx-auto d-table h-100">
+        <div class="d-table-cell align-middle">
+          <div class="text-center mt-4">
+            <h1 class="h2">Gestion App Bolivariano</h1>
+            <p class="lead">Inicia sesión para continuar</p>
+          </div>
+
+          <div class="card">
+            <div class="card-body">
+              <div class="m-sm-4">
+                <div class="text-center">
+                  <!-- Ícono de usuario -->
+                  <i class="fas fa-user-circle fa-5x"></i> <!-- Aquí está el ícono -->
+                </div>
+
+                <!-- Formulario de login -->
+                <form method="post" name="form" id="form" (submit)="enviar()" #formulario="ngForm">
+                  <div class="mb-3">
+                    <label class="form-label">Usuario</label>
+                    <input class="form-control form-control-lg" [(ngModel)]="user_login.username" #username="ngModel" type="text" name="usuario" placeholder="Ingrese el Usuario" />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Contraseña</label>
+                    <input class="form-control form-control-lg" [(ngModel)]="user_login.password" #password="ngModel" type="password" name="password" placeholder="Ingresa la Contraseña" />
+
+                  </div>
+
+                  <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-custom" [disabled]="!formulario.form.valid">Ingresar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,53 @@
+<nav id="sidebar" class="sidebar js-sidebar">
+  <div class="sidebar-content js-simplebar">
+    <a class="sidebar-brand" routerLink="/home">
+<span class="align-middle">Bolivariano</span>
+</a>
+
+    <ul class="sidebar-nav">
+      <li class="sidebar-header" *ngFor="let role of roles">
+      <samp>Perfil:</samp>  {{role | titlecase }}
+
+      </li>
+
+      <!-- Enlace a la página de usuarios visible solo para ADMIN -->
+      <li *ngIf="isAdmin" class="sidebar-item" routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/usuario" title="Usuarios">
+          <i class="fas fa-users align-middle"></i> <span class="align-middle">Usuarios</span>
+        </a>
+      </li>
+
+      <!-- Enlace a la página de profesores visible solo para ADMIN -->
+      <li *ngIf="isAdmin" class="sidebar-item" routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/profesor" title="Profesores">
+          <i class="fas fa-chalkboard-teacher align-middle"></i> <span class="align-middle">Profesores</span>
+        </a>
+      </li>
+
+      <!-- Enlace a la página de estudiantes visible solo para ADMIN -->
+      <li *ngIf="isAdmin || isEstudiante" class="sidebar-item" routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/estudiante" title="Estudiantes">
+          <i class="fas fa-graduation-cap align-middle"></i> <span class="align-middle">Estudiantes</span>
+        </a>
+      </li>
+
+      <!-- Enlace a la página de cursos visible solo para ADMIN -->
+      <li *ngIf="isAdmin" class="sidebar-item" routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/curso" title="Cursos">
+          <i class="fas fa-book align-middle"></i> <span class="align-middle">Cursos</span>
+        </a>
+      </li>
+
+      <li class="sidebar-header">
+        Otros
+      </li>
+
+      <!-- Enlace a la página de gestión de notas visible solo para ESTUDIANTE -->
+      <li *ngIf="isAdmin" class="sidebar-item" routerLinkActive="active">
+        <a class="sidebar-link" routerLink="/nota" title="Gestion Notas">
+          <i class="fas fa-pen align-middle"></i> <span class="align-middle">Gestion Notas</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
